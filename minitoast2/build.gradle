@@ -1,0 +1,115 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+android {
+    compileSdkVersion 26
+
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+group = 'id.juliannr.minitoast'
+version = '0.1.1'
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'Mini Toast'
+            description 'A library for simply show mini toast'
+            url 'https://github.com/jrizani/minitoast'
+            inceptionYear '2018'
+
+            packaging 'aar'
+            groupId 'id.juliannr'
+            artifactId 'minitoast'
+            version '0.1.1'
+
+            licenses {
+                license {
+                    name 'The MIT License (MIT)'
+                    url 'https://opensource.org/licenses/MIT'
+                }
+            }
+            scm {
+                connection 'https://github.com/jrizani/minitoast.git'
+                url 'https://github.com/jrizani/minitoast'
+
+            }
+            developers {
+                developer {
+                    id = 'juliannr'
+                    name 'Julian Noor Rizani'
+                }
+            }
+        }
+    }
+}
+
+Properties bintrayProperties = new Properties()
+bintrayProperties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+
+bintray {
+    user = bintrayProperties.getProperty('user')
+    key = bintrayProperties.get('key')
+    configurations = ['archives']
+    pkg {
+        repo = 'Android'
+        name = 'MiniToast'
+        userOrg = 'juliannr'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/jrizani/minitoast.git'
+        publish = true
+        version {
+            name = '0.1.1'
+            desc = 'Mini Toast 0.1.1'
+            released = new Date()
+            vcsTag = 'v0.1.1'
+        }
+    }
+}
